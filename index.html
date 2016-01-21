@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <script type="application/javascript">
+
+    var canvasWidth = 500;
+
+    var canvasHeight = 500;
+
+    // need to store the bound level
+    var bound = 60;
+
+    // now get the starting point
+    var bound_init = 30;
+
+    // nuumber of prizes
+    var num_prizes = 6;
+
+    var fulltime = getRandomInt(150,400);
+
+    var curtime = 1;
+
+    var choices =['chocolate','crisps','apple','banana','fish','marmite'];
+
+    /**
+     * Returns a random integer between min (inclusive) and max (inclusive)
+     * Using Math.round() will give you a non-uniform distribution!
+     */
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // in case you like using degrees
+        function toRadians(deg) {
+            return deg * Math.PI / 180
+        }
+
+      function drawWheel(){
+
+        var context = document.getElementById('canvas').getContext('2d');
+
+          // Clear the canvas
+          context.clearRect(0, 0, canvasWidth, canvasHeight);
+
+          context.fillStyle = "black";
+          context.font = "20px serif";
+          context.fillText('Spin me baby' , 70, 30);
+
+          context.beginPath();
+          context.moveTo(450,250);
+          context.lineTo(490,230);
+          context.lineTo(490,270);
+          context.fill();
+          
+
+          context.save();
+            
+          // Move registration point to the center of the canvas
+          context.translate(canvasWidth/2, canvasWidth/2);
+            
+          // Rotate 1 degree
+          context.rotate(toRadians(2) * curtime);
+
+          context.fillStyle = 'lightblue'
+
+          context.beginPath();
+          //ctx.moveTo(cx,cy);
+          context.arc(0,0,200,toRadians(0),toRadians(60));
+          context.lineTo(0,0);
+          context.closePath();
+          context.fill();
+
+          context.save()
+
+          context.rotate(toRadians(30) );
+
+          context.fillStyle = "black";
+          context.font = "20px serif";
+          context.fillText(choices[0] , 70, 0);
+
+          context.restore();
+ 
+          //context.save();
+
+          
+
+          // we need another 7
+          for (var i=0;i<5;i++){
+
+              
+              context.rotate(toRadians(60) );
+
+             if(i%2!=1){
+                context.fillStyle = 'red';
+              } else {
+                context.fillStyle = 'lightblue';
+              }
+              
+              context.beginPath();
+              //ctx.moveTo(cx,cy);
+              context.arc(0,0,200,toRadians(0),toRadians(60));
+              context.lineTo(0,0);
+              context.closePath();
+              context.fill();
+
+              context.save()
+
+              context.rotate(toRadians(30) );
+
+              context.fillStyle = "black";
+              context.font = "20px serif";
+              context.fillText(choices[i + 1] , 70, 0);
+
+              context.restore();
+
+          }
+          
+
+          context.restore();
+
+
+      }
+
+      function final_arc(){
+
+        //we need to calculate the final arc
+        var fin_arc = (2 * fulltime)%360;
+
+        var context = document.getElementById('canvas').getContext('2d');
+
+        context.save();
+        
+        context.beginPath();
+        context.moveTo(250,250);
+        context.arc(250,250,220,toRadians(0),toRadians(fin_arc));
+        context.lineTo(250,250);
+        context.closePath();
+        context.stroke();
+
+        context.restore();
+      }
+
+      function firstRotate(){
+        var elem = document.getElementById("prize1");
+        elem.value = choices[0];
+        var elem = document.getElementById("prize2");
+        elem.value = choices[1];
+        var elem = document.getElementById("prize3");
+        elem.value = choices[2];
+        var elem = document.getElementById("prize4");
+        elem.value = choices[3];
+        var elem = document.getElementById("prize5");
+        elem.value = choices[4];
+        var elem = document.getElementById("prize6");
+        elem.value = choices[5];
+
+        rotate();
+      }
+   
+      function rotate() {
+
+          var elem = document.getElementById("prize1");
+          choices[0] = elem.value;
+          var elem = document.getElementById("prize2");
+          choices[1] = elem.value;
+          var elem = document.getElementById("prize3");
+          choices[2] = elem.value;
+          var elem = document.getElementById("prize4");
+          choices[3] = elem.value;
+          var elem = document.getElementById("prize5");
+          choices[4]  = elem.value;
+          var elem = document.getElementById("prize6");
+          choices[5]  = elem.value;
+
+          drawWheel();
+          
+          // Move registration point back to the top left corner of canvas
+          //context.translate(-canvasWidth/2, -canvasWidth/2);
+
+          
+          
+          curtime++;
+
+          if ( fulltime > curtime){
+                setTimeout(rotate, 4);
+          } else {
+
+            //final_arc();
+
+            fin_deg = (2 * fulltime)%360;
+
+            choice_num = getFinalResult();
+
+            prize = choices[ choice_num ];
+
+            document.querySelector("#spinResult").innerHTML = "Finished at " + fin_deg + " degrees. Prize " + prize;
+          }
+          
+        }
+
+        function getFinalResult(){
+           //full_num = fulltime;
+
+           final_bound = Math.floor(2 *  fulltime / bound) % 6;
+
+           return 5 - final_bound;
+
+           //return full_num;
+        }
+
+        function draw(){
+
+            setInterval(rotate, 4);
+        }
+
+        function rotateAgain(){
+          
+          rotate();
+        }
+
+        function rotateReset(){
+          curtime = 0;
+          fulltime = getRandomInt(200,590);
+          drawWheel();
+        }
+    
+  </script>
+ </head>
+ <body onload="firstRotate();">
+   <canvas id="canvas" width="500" height="500"></canvas>
+   <p><a href="#" onClick="rotateAgain();">Go</a></p>
+   <p><a href="#" onClick="rotateReset();">Reset</a></p>
+   <p id="spinResult">Here we put the winning thing</p>
+   <form>
+    Prize 1: <input type="text" name="prize1" id="prize1"><br>
+    Prize 2: <input type="text" name="prize1" id="prize2"><br>
+    Prize 3: <input type="text" name="prize1" id="prize3"><br>
+    Prize 4: <input type="text" name="prize1" id="prize4"><br>
+    Prize 5: <input type="text" name="prize1" id="prize5"><br>
+    Prize 6: <input type="text" name="prize1" id="prize6"><br>
+
+    </form>
+ </body>
+</html>
